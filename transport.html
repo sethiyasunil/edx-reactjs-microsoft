@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+       <meta charset="UTF-8">
+       <script src="https://unpkg.com/react@15/dist/react.min.js"></script>
+       <script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.24.0/babel.js"></script>
+
+  </head>
+  <body>
+      <div id="root"></div>
+      <script type="text/babel">
+          function TransportTitle(props){
+          	return (
+          				<div>
+							<h2>Welcome to React Transportation</h2>
+							The best place to buy vehicles online<p/>
+
+							<h2>Choose Options</h2>
+          				</div>
+          			)
+          }
+
+          function IsNewOption(props){
+          	return (
+          		<div>
+					<div>
+						New Only
+						<input type="checkbox" id="coding" name="interest" value="coding" checked/>
+					</div>
+				</div>
+          	)
+          }
+
+          function TransportType(props){
+          	return (
+					<option value ="{props.type}">{props.type}</option>
+          	)
+          }
+
+          function TransportTypes(props){
+          	return (
+          		<div>
+					<div><p/>
+					Select Type
+					<select>
+						<TransportType  type={props.types[0]}/>
+						<TransportType  type={props.types[1]}/>
+						<TransportType  type={props.types[2]}/>
+						<TransportType  type={props.types[3]}/>
+					</select>
+					</div>
+				</div>
+          	)
+          }
+
+		  function VehicleDetail(props){
+			return (
+						<ul>
+							<table>
+								<tr>
+									<th>Year</th>
+									<th>Model</th>
+									<th>Price</th>
+									<th>Buy</th>
+								</tr>
+								<tr>
+									<td>{props.vehicle.year}</td>
+									<td>{props.vehicle.model}</td>
+									<td>${props.vehicle.price}</td>
+									<td><button>Buy Now</button></td>
+								</tr>
+							</table>
+						</ul>
+			)
+		  }
+
+		  function VehicleDetails(props){
+			  return (
+				<div>
+					 <h2>{props.type}</h2>
+					 <VehicleDetail vehicle={props.vehicles[0]}/>
+					 <VehicleDetail vehicle={props.vehicles[1]}/>
+					 <VehicleDetail vehicle={props.vehicles[2]}/>
+				</div>
+			)
+		  }
+
+
+              function TransportApp(props){
+
+              	return (
+              		<div>
+              			<TransportTitle/>
+						<IsNewOption/>
+						<TransportTypes types={["All","Cars","Trucks","Convertibles"]}/>
+						<VehicleDetails type="Car"  vehicles={[{"year":2013,"model":"A",price:32000},
+																{"year":2011,"model":"B",price:4400},
+																{"year":2016,"model":"B",price:15500}
+																]}/>
+              		</div>
+              	)
+              }
+
+           ReactDOM.render(
+             <TransportApp/>,
+             document.getElementById("root")
+           )
+
+      </script>
+
+  </body>
+</html>
