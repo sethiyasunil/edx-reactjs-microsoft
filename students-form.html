@@ -10,120 +10,109 @@
   <body>
       <div id="root"></div>
       <script type="text/babel">
-
-
-          function PostText(props){
-              var style = {
-                  border:"1px solid black",
-                  width: props.width
-              }
-              return (
-                  <div style = {style}>{props.text}</div>
-              )
-          }
-
-          function PostButton(props){
-              var style = {
-                  width:props.width,
-                  height:24
-              }
-              return (
-                  <button style={style} onClick = {props.handleClick}>{props.label}</button>
-              )
-          }
-
-          function Post(props){
-              var style = {
-                  display:"flex"
-              }
-              return (
-                  <div style = {style}>
-                      <PostButton label = "x" handleClick={props.removeItem}/>
-                      <PostText text = {props.title} width = "200"/>
-                      <PostButton label = "+" handleClick={props.incrementScore}/>
-                      <PostText text = {props.score} width = "20"/>
-                      <PostButton label = "-" handleClick={props.decrementScore}/>
-                  </div>
-              )
-          }
-
-          function PostList(props){
-              return (
-                  <ol>
-                      {
-                          props.postList.map((item,index) =>
-                              <Post key = {index}
-                                    title = {item.title}
-                                    score = {item.score}
-                                    incrementScore = {() => props.updateScore(index,1)}
-                                    decrementScore = {() => props.updateScore(index,-1)}
-                                    removeItem = {() => props.removeItem(index)}
-                              />
-                          )
-                      }
-                  </ol>
-              )
-          }
-
-          class App extends React.Component{
+          class CourseRegistration extends React.Component {
               constructor(props){
                   super(props)
-                  this.state ={value:"",items:[]}
+                  this.state = {registrations: []}
               }
+              addRegistration(info){
+                  var newRegistrations = this.state.registrations.slice()
+                  newRegistrations.push(info);
+                  this.setState({registrations: newRegistrations})
 
-              handleChange(event){
-                  this.setState({value:event.target.value})
-                  console.log(this.state.value)
               }
-
-              updateScore(index,val){
-                  console.log(index ,' ', val)
-                  var itemsCopy = this.state.items.slice()
-                  itemsCopy[index].score += val
-                  itemsCopy.sort((a,b) => {
-                      return b.score - a.score
-                  })
-                  this.setState({items:itemsCopy})
+              removeRegistration(index){
+                  var newRegistrations = this.state.registrations.slice();
+                  newRegistrations.splice(index, 1);
+                  this.setState({registrations: newRegistrations});
               }
-
-              addItem(){
-                  var itemsCopy = this.state.items.slice()
-                  itemsCopy.push({title:this.state.value,score:0})
-                  itemsCopy.sort((a,b)=>{
-                      return b.score - a.score;
-                  })
-                  var state = {value:'',items:itemsCopy}
-                  this.setState(state)
-                  console.log(this.state)
-              }
-
-              removeItem(index){
-                  var itemsCopy = this.state.items.slice()
-                  itemsCopy.splice(index,1);
-                  itemsCopy.sort((a,b) => {
-                      return b.score - a.score
-                  })
-
-                  this.setState({items:itemsCopy})
-              }
-
               render(){
                   return (
                       <div>
-                          <input value={this.state.value} onChange={this.handleChange.bind(this)}></input>
-                          <button type="button" onClick={()=>this.addItem()}>Submit</button>
-                          <PostList postList = {this.state.items} updateScore={this.updateScore.bind(this)}
-                          removeItem={this.removeItem.bind(this)}/>
+                          <RegistrationForm addRegistration={this.addRegistration.bind(this)}/>
+                          <RegistrationsList registrations={this.state.registrations} removeRegistration={this.removeRegistration.bind(this)}/>
                       </div>
                   )
               }
           }
 
+          function RegistrationsList(props){
+              return (
+                  <table>
+                      <tr><td>Remove</td><td>FirstName</td><td>LastName</td><td>Activity</td><td>Restrictions</td></tr>
+                      {
+                          props.registrations.map((item, index) => {
+                              return (
+                                  <tr><td><button onClick={() => props.removeRegistration(index)}>x</button></td>
+                                      <td>{item.firstName}</td><td>{item.lastName}</td><td>{item.activity}</td><td>{item.restrictions.join("")}</td></tr>
+                              )
+                          })
+                      }
+                  </table>
+              )
+          }
 
-        ReactDOM.render(
-          <App/>,
-          document.getElementById("root")
-        )
+          class RegistrationForm extends React.Component {
+              constructor(props){
+                  super(props)
+                  this.state ={
+                      firstName: "",
+                      lastName: "",
+                      activity: "Science Lab",
+                      restrictions: ["", "", ""]
+                  }
+              }
+              handleChange(event){
+                  this.setState({[event.target.name]: event.target.value});
+              }
+              handleCheck(index, symbol){
+                  var restrictionsCopy = this.state.restrictions.slice()
+                  restrictionsCopy[index] = (restrictionsCopy[index] == "" ? symbol : "")
+                  console.log(restrictionsCopy);
+                  this.setState({restrictions: restrictionsCopy})
+
+              }
+              render(){
+                  var activities = ["Science Lab","Swimming","Cooking","Painting"];
+                  var restrictions = ["a) Dietary Restrictions", "b) Physical Disabilities",
+                      "c) Medical Needs"]
+                  return (
+                      <div>
+                          <label for="firstName">First Name</label>
+                          <input type="text" name="firstName" value={this.state.firstName} onChange={this.handleChange.bind(this)}/><br/>
+                          <label for="lastName">Last Name</label>
+                          <input type="text" name="lastName" value={this.state.lastName} onChange={this.handleChange.bind(this)}/><br/>
+                          <select name="activity" value={this.state.selectedActivity} onChange={this.handleChange.bind(this)}>
+                              {
+                                  activities.map(activity => {
+                                      return <option value={activity}>{activity}</option>
+                                  })
+                              }
+                          </select><br/>
+                          <Restrictions restrictions={restrictions} handleCheck={this.handleCheck.bind(this)}/>
+                          <button onClick={ () => this.props.addRegistration(this.state)}>Submit</button>
+                      </div>
+                  )
+
+              }
+          }
+
+          function Restrictions(props){
+              return (
+                  <ol>
+                      {
+                          props.restrictions.map((restriction, index) => {
+                              return (<p><input type="checkbox" onChange={() => props.handleCheck(index, restriction[0])}/>{restriction}</p>)
+                          })
+                      }
+                  </ol>
+              )
+          }
+
+          ReactDOM.render(
+              <CourseRegistration/>,
+              document.getElementById("root")
+          )
       </script>
 
   </body>
